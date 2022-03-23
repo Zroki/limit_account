@@ -1,1 +1,1 @@
-define((function(){"use strict";return function(){return(n=>{if(window[n])throw new Error("Двойная инициализация виджета.");window[n]=!0})("__тут название виджета123__"),this.callbacks={render:async()=>!0,bind_actions:()=>!0,onSave:()=>!0,init:()=>!0,settings:()=>!0},this}}));
+define(['http://127.0.0.1:5501/widget.js'], Widget => Widget);

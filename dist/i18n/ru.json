@@ -1,8 +1,8 @@
 {
   "widget": {
-    "name": "",
-    "short_description": "",
-    "description": ""
+    "name": "Лимиты аккаунта",
+    "short_description": "Лимиты аккаунта",
+    "description": "Лимиты аккаунта"
   },
   "settings": {
     "config": "config"

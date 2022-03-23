@@ -1,11 +1,6 @@
 /// <reference path="./types/AmoCRM.d.ts" />
 /// <reference path="./types/Widget.d.ts" />
 
-import { getDefaultSettings } from "./defaults";
-
-import Settings from './components/Settings.svelte';
-// import Subscription from './subscription/Subscription';
-
 function widgetConstructor() {
   const checkDoubleInitialization = (key: string) => {
     if (window[key]) {
@@ -14,63 +9,93 @@ function widgetConstructor() {
     // @ts-ignore
     window[key] = true;
   };
-  checkDoubleInitialization('__тут название виджета123__');
+  checkDoubleInitialization('__limit_account_v2__');
 
   const widget: Widget = this;
 
-  function getSettings(): any | {} {
-    let settings = widget.get_settings().config;
-    if (!settings || Array.isArray(settings)) {
-      return getDefaultSettings();
+  async function getCurrentCountEssense(essense) {
+    const e = await fetch(`/ajax/${essense}/list/`, {
+        headers: {
+            "x-requested-with": "XMLHttpRequest"
+        },
+        method: "POST"
+    });
+    try {
+        const n = await e.json();
+        return 200 !== e.status ? 0 : "contacts" === essense ? n.response.summary.persons_count : "leads" === essense ? n.response.summary.count : 0
+    } catch (t) {
+        return 0
     }
-    if (typeof settings === 'object') {
-      settings = JSON.stringify(settings);
+}
+
+  async function getLimitsAccount() {
+    try {
+      const req1 = await fetch("/private/api/v2/json/accounts/current", {
+        headers: {
+          "x-requested-with": "XMLHttpRequest"
+        }
+      });
+
+      const req2 = await fetch("/ajax/settings/custom_fields/", {
+        headers: {
+          "x-requested-with": "XMLHttpRequest"
+        },
+        method: "POST",
+      });
+
+      const res1 = await req1.json();
+      const res2 = await req2.json();
+
+      return {
+        leads: {
+          current: 0,
+          limit: res1.response.account.limits.active_deals_count
+        },
+        contacts: {
+          current: 0,
+          limit: res1.response.account.limits.contacts_count
+        },
+        users: {
+          current: 0,
+          limit: res1.response.account.limits.users_count
+        },
+        cf: {
+          current: Object.keys(AMOCRM.constant('account')).length,
+          limit: res2.response.params.tariff.cf_max_count
+        }
+      };
+    } catch (error) {
+      return {
+        leads: {
+          current: 0,
+          limit: 0
+        },
+        contacts: {
+          current: 0,
+          limit: 0
+        },
+        users: {
+          current: 0,
+          limit: 0
+        },
+        cf: {
+          current: 0,
+          limit: 0
+        }
+      };
     }
-    settings = settings
-      .replace(/{{!eql!}}/gm, '=')
-      .replace(/{{!amp!}}/gm, '&')
-      .replace(/{{!plus!}}/gm, '+')
-      .replace(/{{!qsn!}}/gm, '?');
-    settings = JSON.parse(settings);
-    return settings;
   }
 
   widget.callbacks = {
     render: async () => {
-      // const widgetCode = widget.get_settings().widget_code;
-      // const expired = await new Subscription(widgetCode).isSubscriptionExpired();
-      // if (expired) {
-      //     return true;
-      // }
+
 
       return true;
     },
     bind_actions: () => true,
     onSave: () => true,
     init: () => true,
-    settings: () => {
-      const widgetCode = widget.get_settings().widget_code;
-      // const subs = new Subscription(widgetCode);
-      //
-      // subs.setPanelSubscriptionInfoSettings();
-      // subs.addListenerOnShutdownWidget();
-
-      const settingsWrapper = document.querySelector('#widget_settings__fields_wrapper');
-      const hiddenInput = document.querySelector(`#${ widgetCode }_custom`);
-
-      settingsWrapper.insertAdjacentHTML('afterbegin', `<div class="${ widgetCode }_settings_block_main"></div>`)
-
-      const settingsPlace = document.querySelector(`.${ widgetCode }_settings_block_main`);
-
-      new Settings({
-        target: settingsPlace,
-        props: {
-          hiddenInput,
-        },
-      });
-
-      return true;
-    },
+    settings: () => true,
   };
 
   return widget;
