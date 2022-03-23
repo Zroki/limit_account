@@ -1,0 +1,31 @@
+{
+  "name": "svelte-app",
+  "version": "1.0.0",
+  "scripts": {
+    "build_patch": "rollup -c && node .patch.js patch",
+    "build_minor": "rollup -c && node .patch.js minor",
+    "build_major": "rollup -c && node .patch.js major",
+    "dev": "rollup -c -w"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^19.0.0",
+    "@rollup/plugin-node-resolve": "^13.0.0",
+    "@rollup/plugin-typescript": "^8.2.1",
+    "@tsconfig/svelte": "^2.0.1",
+    "svelte-check": "^2.0.0",
+    "svelte-preprocess": "^4.0.0",
+    "tslib": "^2.0.0",
+    "eslint": "^7.27.0",
+    "moment": "^2.29.1",
+    "rollup": "^2.50.5",
+    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-serve": "^1.1.0",
+    "rollup-plugin-svelte": "^7.1.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "sirv-cli": "^1.0.12",
+    "typescript": "^4.3.2"
+  },
+  "dependencies": {
+    "svelte": "^3.38.2"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "widget": {
+    "name": "",
+    "short_description": "",
+    "description": ""
+  },
+  "settings": {
+    "config": "config"
+  }
+}
