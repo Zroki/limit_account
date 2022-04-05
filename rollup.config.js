@@ -44,10 +44,10 @@ export default {
     !production &&
     serve({
       verbose: true,
-      contentBase: 'dist',
+      contentBase: '',
       historyApiFallback: false,
       host: 'localhost',
-      port: 5502,
+      port: 5501,
       https: false,
     }),
   ],

@@ -1,5 +1,8 @@
 /// <reference path="./types/AmoCRM.d.ts" />
+/// <reference path="./types/Limits.d.ts" />
 /// <reference path="./types/Widget.d.ts" />
+
+import AccountLimit from './components/AccountLimit.svelte';
 
 function widgetConstructor() {
   const checkDoubleInitialization = (key: string) => {
@@ -13,28 +16,38 @@ function widgetConstructor() {
 
   const widget: Widget = this;
 
+  async function sleep(ms: number) {
+      return new Promise((res) => {
+        setTimeout(() => {
+          res(true);
+        }, ms);
+      });
+  }
+
   async function getCurrentCountEssense(essense) {
-    const e = await fetch(`/ajax/${essense}/list/`, {
+    const req = await fetch(`/ajax/${essense}/list/`, {
         headers: {
             "x-requested-with": "XMLHttpRequest"
         },
         method: "POST"
     });
     try {
-        const n = await e.json();
-        return 200 !== e.status ? 0 : "contacts" === essense ? n.response.summary.persons_count : "leads" === essense ? n.response.summary.count : 0
+        const res = await req.json();
+        return 200 !== req.status ? 0 : "contacts" === essense ? res.response.summary.persons_count : "leads" === essense ? res.response.summary.count : 0
     } catch (t) {
         return 0
     }
 }
 
-  async function getLimitsAccount() {
+  async function getLimitsAccount(): Promise<Limits> {
     try {
       const req1 = await fetch("/private/api/v2/json/accounts/current", {
         headers: {
           "x-requested-with": "XMLHttpRequest"
         }
       });
+
+      await sleep(300);
 
       const req2 = await fetch("/ajax/settings/custom_fields/", {
         headers: {
@@ -46,22 +59,40 @@ function widgetConstructor() {
       const res1 = await req1.json();
       const res2 = await req2.json();
 
+      await sleep(300);
+
+      const leadsCount = await getCurrentCountEssense('leads');
+
+      await sleep(300);
+
+      const contactsAndCompanyCount = await getCurrentCountEssense('contacts');
+
       return {
         leads: {
-          current: 0,
+          current: leadsCount,
           limit: res1.response.account.limits.active_deals_count
         },
-        contacts: {
-          current: 0,
+        contactsAndCompany: {
+          current: contactsAndCompanyCount,
           limit: res1.response.account.limits.contacts_count
         },
         users: {
-          current: 0,
+          current: Object.values(AMOCRM.constant('managers')).filter(user => user.active).length,
           limit: res1.response.account.limits.users_count
         },
         cf: {
-          current: Object.keys(AMOCRM.constant('account')).length,
-          limit: res2.response.params.tariff.cf_max_count
+          leads: {
+            current: Object.values(AMOCRM.constant('account').cf).filter(item => item.ENTREE_DEALS === 1).length,
+            limit: res2.response.params.tariff.cf_max_count
+          },
+          contacts: {
+            current: Object.values(AMOCRM.constant('account').cf).filter(item => item.ENTREE_CONTACTS === 1).length,
+            limit: res2.response.params.tariff.cf_max_count
+          },
+          company: {
+            current: Object.values(AMOCRM.constant('account').cf).filter(item => item.ENTREE_COMPANY === 1).length,
+            limit: res2.response.params.tariff.cf_max_count
+          }
         }
       };
     } catch (error) {
@@ -70,7 +101,7 @@ function widgetConstructor() {
           current: 0,
           limit: 0
         },
-        contacts: {
+        contactsAndCompany: {
           current: 0,
           limit: 0
         },
@@ -79,8 +110,18 @@ function widgetConstructor() {
           limit: 0
         },
         cf: {
-          current: 0,
-          limit: 0
+          leads: {
+            current: 0,
+            limit: 0
+          },
+          contacts: {
+            current: 0,
+            limit: 0
+          },
+          company: {
+            current: 0,
+            limit: 0
+          }
         }
       };
     }
@@ -88,7 +129,18 @@ function widgetConstructor() {
 
   widget.callbacks = {
     render: async () => {
+      if (AMOCRM.widgets.system.area !== 'settings') {
+        return true;
+      }
+      
+      const accountLimits = await getLimitsAccount();
 
+      new AccountLimit({
+        target: document.querySelector('.public-integrations-list'),
+        props: {
+          accountLimits
+        }
+      })
 
       return true;
     },
