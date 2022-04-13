@@ -1,4 +1,6 @@
-<script type="ts">
+<script lang="ts">
+  import { fade } from 'svelte/transition';
+
   export let accountLimits: Limits;
 
   let isCollapse = true;
@@ -14,80 +16,24 @@
   </div>
 
   {#if !isCollapse}
-    <div class="account_info">
-      <h3 class="title">Сущности</h3>
-      <div class="item">
-        <span>Сделки</span>
-        <span
-          class="{accountLimits.leads.current >= accountLimits.leads.limit
-            ? 'over_limit'
-            : ''}"
-          >{accountLimits.leads.current}/{accountLimits.leads.limit}</span
-        >
-      </div>
-      <div class="item">
-        <span>Контакты и компании</span>
-        <span
-          class="{accountLimits.contactsAndCompany.current >=
-          accountLimits.contactsAndCompany.limit
-            ? 'over_limit'
-            : ''}"
-          >{accountLimits.contactsAndCompany.current}/{accountLimits
-            .contactsAndCompany.limit}</span
-        >
-      </div>
-      <div class="item">
-        <span>Компании</span>
-        <span
-          class="{accountLimits.company.current >=
-          accountLimits.company.limit
-            ? 'over_limit'
-            : ''}"
-          >{accountLimits.company.current}/{accountLimits
-            .company.limit}</span
-        >
-      </div>
-      <div class="item">
-        <span>Пользователи</span>
-        <span
-          class="{accountLimits.users.current >= accountLimits.users.limit
-            ? 'over_limit'
-            : ''}"
-          >{accountLimits.users.current}/{accountLimits.users.limit}</span
-        >
-      </div>
-      <h3 class="title">Поля</h3>
-      <div class="item">
-        <span>Сделка</span>
-        <span
-          class="{accountLimits.cf.leads.current >= accountLimits.cf.leads.limit
-            ? 'over_limit'
-            : ''}"
-          >{accountLimits.cf.leads.current}/{accountLimits.cf.leads.limit}</span
-        >
-      </div>
-      <div class="item">
-        <span>Контакт</span>
-        <span
-          class="{accountLimits.cf.contacts.current >=
-          accountLimits.cf.contacts.limit
-            ? 'over_limit'
-            : ''}"
-          >{accountLimits.cf.contacts.current}/{accountLimits.cf.contacts
-            .limit}</span
-        >
-      </div>
-      <div class="item">
-        <span>Компания</span>
-        <span
-          class="{accountLimits.cf.company.current >=
-          accountLimits.cf.company.limit
-            ? 'over_limit'
-            : ''}"
-          >{accountLimits.cf.company.current}/{accountLimits.cf.company
-            .limit}</span
-        >
-      </div>
+    <div transition:fade="{{ duration: 300 }}" class="account_info">
+      {#each Object.values(accountLimits) as limit}
+        <h3 class="title">{limit.headers}</h3>
+        {#each Object.values(limit.fields) as field}
+          <div class="item">
+            <span>{field.label}</span>
+            {#if field.limit}
+              <span class="{field.current >= field.limit
+                ? 'over_limit'
+                : ''}"
+              >{field.current}/{field.limit}</span>
+            {:else}
+              <span>{field.current}</span>
+            {/if}
+            
+          </div>
+        {/each}
+      {/each}
     </div>
   {/if}
 </div>
@@ -98,13 +44,14 @@
     left: calc(50% - 150px);
   }
   .over_limit {
+    font-weight: bold;
     color: red;
   }
   .account_info_button {
-    border: 1px solid black;
-    border-radius: 5px;
+    border: 1px solid #dbdedf;
+    border-radius: 3px;
     padding: 5px 80px;
-    background-color: #4974f6;
+    background-color: #4c8bf7;
     cursor: pointer;
     text-align: center;
   }
@@ -112,21 +59,23 @@
     color: white;
     font-size: 17px;
     font-weight: bold;
+    margin-bottom: 10px;
   }
   .account_info .title {
     color: black;
     text-align: center;
   }
   .account_info {
-    border: 1px solid black;
+    border: 1px solid #dbdedf;
     border-radius: 0 0 3px 3px;
     position: relative;
     background-color: white;
-    padding: 5px 10px;
+    padding: 10px;
   }
   .account_info .item {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 2px;
   }
 </style>

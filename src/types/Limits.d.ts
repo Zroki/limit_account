@@ -1,32 +1,51 @@
 interface Limits {
-  leads: {
-    current: number,
-    limit: number
-  },
-  contactsAndCompany: {
-    current: number,
-    limit: number
-  },
-  company: {
-    current: number,
-    limit: number,
-  },
-  users: {
-    current: number,
-    limit: number
+  entitys: {
+    headers: string,
+    fields: {
+      leads: {
+        current: number,
+        limit: number,
+        label: string,
+      },
+      contacts: {
+        current: number,
+        limit: number,
+        label: string,
+      },
+      company: {
+        current: number,
+        limit: number,
+        label: string,
+      },
+      usersActive: {
+        current: number,
+        limit: number,
+        label: string,
+      },
+      usersNoActive: {
+        current: number,
+        label: string,
+      }
+    }
   },
   cf: {
-    leads: {
-      current: number,
-      limit: number
-    },
-    contacts: {
-      current: number,
-      limit: number
-    },
-    company: {
-      current: number,
-      limit: number
+    headers: string,
+    fields: {
+      leads: {
+        current: number,
+        limit: number,
+        label: string,
+      },
+      contacts: {
+        current: number,
+        limit: number,
+        label: string,
+      },
+      company: {
+        current: number,
+        limit: number,
+        label: string,
+      }
     }
   }
 }

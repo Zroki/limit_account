@@ -47,7 +47,7 @@ export default {
       contentBase: '',
       historyApiFallback: false,
       host: 'localhost',
-      port: 5501,
+      port: 5503,
       https: false,
     }),
   ],
