@@ -17,43 +17,58 @@ function widgetConstructor() {
   const widget: Widget = this;
 
   async function sleep(ms: number) {
-      return new Promise((res) => {
-        setTimeout(() => {
-          res(true);
-        }, ms);
-      });
+    return new Promise((res) => {
+      setTimeout(() => {
+        res(true);
+      }, ms);
+    });
   }
 
   async function getCurrentCountEssense(essense) {
     const req = await fetch(`/ajax/${essense}/list/`, {
-        headers: {
-            "x-requested-with": "XMLHttpRequest"
-        },
-        method: "POST"
+      headers: {
+        'x-requested-with': 'XMLHttpRequest',
+      },
+      method: 'POST',
     });
     try {
-        const res = await req.json();
-        return 200 !== req.status ? 0 : "contacts" === essense ? res.response.summary.persons_count : "leads" === essense ? res.response.summary.count : 0
+      const res = await req.json();
+      return 200 !== req.status ? 0 : 'contacts' === essense ? res.response.summary.persons_count : 'leads' === essense ? res.response.summary.count : 0
     } catch (t) {
-        return 0
+      return 0;
     }
-}
+  }
+
+  async function getCurrentCountCompaines(essense) {
+    const req = await fetch(`/ajax/contacts/list/${essense}`, {
+      headers: {
+        'x-requested-with': 'XMLHttpRequest',
+      },
+      method: 'POST',
+    });
+    try {
+      const res = await req.json();
+      return 200 !== req.status ? 0 : res.response.summary.persons_count;
+    } catch (t) {
+      return 0;
+    }
+  }
 
   async function getLimitsAccount(): Promise<Limits> {
     try {
-      const req1 = await fetch("/private/api/v2/json/accounts/current", {
+      const req1 = await fetch('/private/api/v2/json/accounts/current', {
         headers: {
-          "x-requested-with": "XMLHttpRequest"
-        }
+          'x-requested-with': 'XMLHttpRequest',
+        },
       });
 
       await sleep(300);
 
-      const req2 = await fetch("/ajax/settings/custom_fields/", {
+      const req2 = await fetch('/ajax/settings/custom_fields/', {
         headers: {
-          "x-requested-with": "XMLHttpRequest"
+          'x-requested-with': 'XMLHttpRequest',
         },
-        method: "POST",
+        method: 'POST',
       });
 
       const res1 = await req1.json();
@@ -67,62 +82,78 @@ function widgetConstructor() {
 
       const contactsAndCompanyCount = await getCurrentCountEssense('contacts');
 
+      await sleep(300);
+
+      const companyCount = await getCurrentCountCompaines('compaines');
+
+      await sleep(300);
+
+      // const contactCount = await getCurrentCountCompaines('contacts');
+
       return {
         leads: {
           current: leadsCount,
-          limit: res1.response.account.limits.active_deals_count
+          limit: res1.response.account.limits.active_deals_count,
         },
         contactsAndCompany: {
           current: contactsAndCompanyCount,
-          limit: res1.response.account.limits.contacts_count
+          limit: res1.response.account.limits.contacts_count,
+        },
+        company: {
+          current: companyCount,
+          limit: 50,
         },
         users: {
-          current: Object.values(AMOCRM.constant('managers')).filter(user => user.active).length,
-          limit: res1.response.account.limits.users_count
+          current: Object.values(AMOCRM.constant('managers')).filter((user) => user.active).length,
+          limit: res1.response.account.limits.users_count,
         },
         cf: {
           leads: {
-            current: Object.values(AMOCRM.constant('account').cf).filter(item => item.ENTREE_DEALS === 1).length,
-            limit: res2.response.params.tariff.cf_max_count
+            current: Object.values(AMOCRM.constant('account').cf).filter((item) => item.ENTREE_DEALS === 1).length,
+            limit: res2.response.params.tariff.cf_max_count,
           },
           contacts: {
-            current: Object.values(AMOCRM.constant('account').cf).filter(item => item.ENTREE_CONTACTS === 1).length,
-            limit: res2.response.params.tariff.cf_max_count
+            current: Object.values(AMOCRM.constant('account').cf).filter((item) => item.ENTREE_CONTACTS === 1).length,
+            limit: res2.response.params.tariff.cf_max_count,
           },
           company: {
-            current: Object.values(AMOCRM.constant('account').cf).filter(item => item.ENTREE_COMPANY === 1).length,
-            limit: res2.response.params.tariff.cf_max_count
-          }
-        }
+            current: Object.values(AMOCRM.constant('account').cf).filter((item) => item.ENTREE_COMPANY === 1).length,
+            limit: res2.response.params.tariff.cf_max_count,
+          },
+        },
       };
     } catch (error) {
       return {
         leads: {
           current: 0,
-          limit: 0
+          limit: 0,
         },
         contactsAndCompany: {
           current: 0,
-          limit: 0
+          limit: 0,
+        },
+        company: {
+          current: 0,
+          limit: 0,
         },
         users: {
           current: 0,
-          limit: 0
+          limit: 0,
         },
         cf: {
           leads: {
             current: 0,
-            limit: 0
+            limit: 0,
           },
           contacts: {
             current: 0,
-            limit: 0
+            limit: 0,
           },
           company: {
             current: 0,
-            limit: 0
-          }
-        }
+            limit: 0,
+          },
+        },
       };
     }
   }
@@ -132,15 +163,15 @@ function widgetConstructor() {
       if (AMOCRM.widgets.system.area !== 'settings') {
         return true;
       }
-      
+
       const accountLimits = await getLimitsAccount();
 
       new AccountLimit({
         target: document.querySelector('.public-integrations-list'),
         props: {
-          accountLimits
-        }
-      })
+          accountLimits,
+        },
+      });
 
       return true;
     },

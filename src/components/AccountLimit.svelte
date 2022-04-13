@@ -37,6 +37,17 @@
         >
       </div>
       <div class="item">
+        <span>Компании</span>
+        <span
+          class="{accountLimits.company.current >=
+          accountLimits.company.limit
+            ? 'over_limit'
+            : ''}"
+          >{accountLimits.company.current}/{accountLimits
+            .company.limit}</span
+        >
+      </div>
+      <div class="item">
         <span>Пользователи</span>
         <span
           class="{accountLimits.users.current >= accountLimits.users.limit

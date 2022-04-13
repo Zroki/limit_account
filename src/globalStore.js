@@ -1,3 +1,3 @@
 import { writable } from 'svelte/store';
 
-export let globalStore = writable({});
+export default writable({});

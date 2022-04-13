@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getDefaultSettings } from "../defaults";
+  import getDefaultSettings from "../defaults";
 
   export let hiddenInput = null;
 

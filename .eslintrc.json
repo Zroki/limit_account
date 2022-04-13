@@ -1,0 +1,55 @@
+// это в settings.js в VS Code
+// "eslint.validate": [
+//     "javascript",
+//     "svelte"
+// ]
+{
+    "env": {
+        "browser": true,
+        "amd": true,
+        "es6": true
+    },
+    "plugins" : ["sonarjs", "svelte3"],
+    "overrides": [
+        {
+            "files": ["**/*.svelte"],
+            "processor": "svelte3/svelte3"
+        }
+    ],
+    "extends": [
+        "airbnb-base",
+        "airbnb-typescript/base",
+        "plugin:sonarjs/recommended"
+    ],
+    "globals": {
+        "AMOCRM": "readonly",
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parserOptions": {
+        "ecmaVersion": 2019,
+        "project": "./tsconfig.json",
+        "sourceType": "module"
+    },
+    "rules": {
+        "no-new": 0,
+        "import/first": 0,
+        "import/no-mutable-exports": 0,
+        "no-alert": "error",
+        "class-methods-use-this": "off",
+        "no-await-in-loop": "off",
+        "no-console": "error",
+        "curly": ["error", "all"],
+        "indent": ["error", 2, {
+            "ignoredNodes": ["TemplateLiteral *"],
+            "SwitchCase": 1 }
+        ],
+        "import/no-amd": 0,
+        "no-param-reassign": [2, {
+            "props": false
+        }],
+        "import/no-dynamic-require": 0,
+        "global-require": 0,
+        "max-len": 0
+    }
+}
