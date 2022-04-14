@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
 
-  export let accountLimits: Limits;
+  export let accountLimits: LimitsV2[];
 
   let isCollapse = true;
 
@@ -17,9 +17,9 @@
 
   {#if !isCollapse}
     <div transition:fade="{{ duration: 300 }}" class="account_info">
-      {#each Object.values(accountLimits) as limit}
-        <h3 class="title">{limit.headers}</h3>
-        {#each Object.values(limit.fields) as field}
+      {#each accountLimits as essense}
+        <h3 class="title">{essense.headers}</h3>
+        {#each essense.fields as field}
           <div class="item">
             <span>{field.label}</span>
             {#if field.limit}

@@ -32,6 +32,7 @@
         "sourceType": "module"
     },
     "rules": {
+        "no-underscore-dangle": 0,
         "no-new": 0,
         "import/first": 0,
         "import/no-mutable-exports": 0,
