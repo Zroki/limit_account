@@ -171,9 +171,70 @@ async function getBasicLimitsObj() {
   };
 }
 
+async function getLimitsAccount() {
+  try {
+    const accountLimitsObj = await getBasicLimitsObj();
+
+    return [
+      {
+        headers: 'Сущности',
+        fields: [
+          {
+            current: accountLimitsObj.leadsCount,
+            limit: accountLimitsObj.accountLimits.active_deals_count,
+            label: 'Сделки',
+          },
+          {
+            current: accountLimitsObj.contactsCount,
+            limit: 50,
+            label: 'Контакты',
+          },
+          {
+            current: accountLimitsObj.companyCount,
+            limit: 50,
+            label: 'Компании',
+          },
+          {
+            current: getUserCount(),
+            limit: accountLimitsObj.accountLimits.users_count,
+            label: 'Пользователи (активные)',
+          },
+          {
+            current: getUserCount(false),
+            label: 'Пользователи (не активные)',
+          },
+        ],
+      },
+      {
+        headers: 'Поля',
+        fields: [
+          {
+            current: getEntreeCount('DEALS'),
+            limit: accountLimitsObj.countCustomFields,
+            label: 'Сделка',
+          },
+          {
+            current: getEntreeCount('CONTACTS'),
+            limit: accountLimitsObj.countCustomFields,
+            label: 'Контакт',
+          },
+          {
+            current: getEntreeCount('COMPANY'),
+            limit: accountLimitsObj.countCustomFields,
+            label: 'Компания',
+          },
+        ],
+      },
+    ];
+  } catch (error) {
+    return getEmptyLimits();
+  }
+}
+
 export {
   getEntreeCount,
   getUserCount,
   getBasicLimitsObj,
   getEmptyLimits,
+  getLimitsAccount,
 };
